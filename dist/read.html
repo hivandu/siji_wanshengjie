@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="maximum-dpr=2" name="flexible" />
+    <meta name="apple-touch-fullscreen" content="no"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <title></title>
+
+    <style>
+        * { padding: 0; margin: 0;}
+        .wrap {
+            background: #000;
+
+        }
+
+        .wrap #picture {
+            width: 10rem;
+        }
+
+        .btn-goPlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+
+            background: url("assets/images/btn-play.png") no-repeat center center;
+            background-size: 10rem 2.653333rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+    <img id="picture" src="" alt=""/>
+
+    <a class="goPlay" href="http://www.subo9.com/huodong/siji_wanshengjie/"></a>
+</div>
+
+<script src="assets/scripts/flexible.js"></script>
+<script src="assets/scripts/socket.io.js"></script>
+
+<script>
+    $(function () {
+        var app = {
+            server: {
+                init: function () {
+                    console.log("Initializing server...");
+                    this.socket = io.connect('http://120.26.48.94:1244');
+
+                    var imgID = getURLParameter('imgID');
+
+                    if (imgID) {
+                        this.server.getImage(imgID);
+                    }
+                },
+
+                getImage: function (imgSrc) {
+                    //  get image
+                    console.log('get img');
+                    socket.emit('getImage', imgSrc);
+
+                    //  when get image, render to page
+                    socket.on('returnImage', onReturnImageHandler);
+
+                    function onReturnImageHandler (data) {
+                        var result = data.result;
+
+                        if (data && result != false) {
+                            console.log(data);
+
+                            document.getElementById('picture').src = result;
+                        } else {
+                            throw new Error('get result fail');
+                        }
+                    }
+                }
+            }
+        };
+
+        app.server.init();
+
+        function getURLParameter(name) {
+            return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+        }
+    });
+</script>
+</body>
+</html>
